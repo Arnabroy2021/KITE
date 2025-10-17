@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kite AI Quiz Deployment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0E0E10] text-gray-200 min-h-screen flex flex-col items-center justify-center font-sans">
+
+  <div class="w-full max-w-2xl bg-[#1A1A1D] p-6 rounded-lg shadow-xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold text-white">Kite AI Quiz</h1>
+      <span class="text-sm text-green-400 bg-green-900 px-3 py-1 rounded-full">Ready</span>
+    </div>
+
+    <!-- Question Box -->
+    <div id="quiz-box" class="bg-[#151517] p-4 rounded-lg mb-4">
+      <h2 id="question" class="text-lg font-semibold mb-3"></h2>
+
+      <div id="options" class="space-y-2"></div>
+
+      <p id="feedback" class="mt-4 font-semibold"></p>
+
+      <button id="next-btn" onclick="nextQuestion()" class="hidden mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md">Next</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-between text-sm text-gray-500">
+      <p>Deployment: <span class="text-gray-300">main</span></p>
+      <p>Created: <span class="text-gray-300">Just now</span></p>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        q: "1. Who led Kite AI's $18M Series A investment?",
+        options: ["Google and Amazon", "Meta and OpenAI", "PayPal and General Catalyst", "Microsoft and Salesforce"],
+        correct: 2
+      },
+      {
+        q: "2. What is the name of Kite AI's first Testnet launched in 2025?",
+        options: ["Nimbus", "Aero", "Storm", "Ozone"],
+        correct: 1
+      },
+      {
+        q: "3. Which protocol did Kite AI adopt for secure payments?",
+        options: ["ATP", "SAP", "AP2", "BPP"],
+        correct: 2
+      },
+      {
+        q: "4. Which company partnered with Kite AI for deepfake detection?",
+        options: ["CARV", "BitMind", "Nubila", "APRO"],
+        correct: 1
+      },
+      {
+        q: "5. How much funding did Kite AI raise in its Series A?",
+        options: ["$10 million", "$25 million", "$18 million", "$33 million"],
+        correct: 2
+      },
+      {
+        q: "6. When did Kite AI announce their partnership with EigenLayer?",
+        options: ["April 25, 2025", "September 2, 2025", "March 13, 2024", "June 14, 2025"],
+        correct: 0
+      },
+      {
+        q: "7. Kite AI connects which two technological layers?",
+        options: ["Web1 and Web2", "Cloud and Edge", "Web2 scale and Web3 infrastructure", "Data and Hardware"],
+        correct: 2
+      },
+      {
+        q: "8. Which organization partnered with Kite AI to create an AI marketplace for open data and GPU power?",
+        options: ["EigenLayer", "GAIB", "Filecoin Foundation", "Meta AI"],
+        correct: 1
+      },
+      {
+        q: "9. What is the title of Kite AI’s introductory article?",
+        options: [
+          "AI for Everyone",
+          "Kite AI 101 Part 1 — Vision and Mission",
+          "The Agentic Revolution",
+          "Future of Decentralized Intelligence"
+        ],
+        correct: 1
+      },
+      {
+        q: "10. Which company collaborated with Kite AI to improve AI data management?",
+        options: ["Meta", "Google", "Filecoin Foundation", "PayPal"],
+        correct: 2
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const quizBox = document.getElementById('quiz-box');
+
+    function loadQuestion() {
+      const qData = quizData[currentQuestion];
+      questionEl.textContent = qData.q;
+      optionsEl.innerHTML = '';
+      feedbackEl.textContent = '';
+      nextBtn.classList.add('hidden');
+
+      qData.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option w-full bg-[#222226] hover:bg-[#2C2C30] text-left px-4 py-2 rounded-md';
+        btn.textContent = `${index}. ${opt}`;
+        btn.onclick = () => checkAnswer(index);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const qData = quizData[currentQuestion];
+      const buttons = document.querySelectorAll('.option');
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        if (index === qData.correct) {
+          btn.classList.add('bg-green-600', 'text-white');
+        } else if (index === selected) {
+          btn.classList.add('bg-red-600', 'text-white');
+        }
+      });
+
+      if (selected === qData.correct) {
+        feedbackEl.textContent = '✅ Correct!';
+        feedbackEl.className = 'mt-4 font-semibold text-green-400';
+        score++;
+      } else {
+        feedbackEl.textContent = `❌ Wrong! Correct answer: ${qData.correct}`;
+        feedbackEl.className = 'mt-4 font-semibold text-red-400';
+      }
+
+      nextBtn.classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showFinalScore();
+      }
+    }
+
+    function showFinalScore() {
+      quizBox.innerHTML = `
+        <div class="text-center">
+          <h2 class="text-2xl font-bold mb-4">🎉 Quiz Completed!</h2>
+          <p class="text-lg mb-4">Your final score: <span class="text-green-400">${score}</span> / ${quizData.length}</p>
+          <button onclick="restartQuiz()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Restart Quiz</button>
+        </div>
+      `;
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      quizBox.innerHTML = `
+        <h2 id="question" class="text-lg font-semibold mb-3"></h2>
+        <div id="options" class="space-y-2"></div>
+        <p id="feedback" class="mt-4 font-semibold"></p>
+        <button id="next-btn" onclick="nextQuestion()" class="hidden mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md">Next</button>
+      `;
+      // Re-bind elements after restart
+      questionEl = document.getElementById('question');
+      optionsEl = document.getElementById('options');
+      feedbackEl = document.getElementById('feedback');
+      nextBtn = document.getElementById('next-btn');
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+
+</body>
+</html>
